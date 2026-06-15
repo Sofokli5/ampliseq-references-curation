@@ -7,7 +7,7 @@ The instructions describe how to collect, clean, and standardize plant sequence 
 ## Installation
 
 ```bash
-git clone https://github.com/npechl/plant-curation.git
+git clone https://github.com/Sofokli5/ampliseq-references-curation.git
 ```
 
 > Please follow instruction in each database-related sub folder.
