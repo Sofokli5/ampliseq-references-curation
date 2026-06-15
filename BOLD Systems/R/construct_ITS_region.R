@@ -30,19 +30,31 @@ concatITS <- function(its1, s58, its2) {
   return(concat)
 }
 
-its1 <- "test/250902.ITS1.fasta"
-s58 <- "test/250902.5_8S.fasta"
-its2 <- "test/250902.ITS2.fasta"
+# optparse -------------------------------------------------------------
+library(optparse)
 
-outdir <- its1 |> dirname()
-db <- its1 |>
-  basename() |>
-  str_split_i("\\.", 1)
+parser <- OptionParser() |>
+  add_option(c("--its1"), type = "character", help = "ITS1 FASTA file [required]")|>
+  add_option(c("--s58"), type = "character", help = "5.8S FASTA file [required]")|>
+  add_option(c("--its2"), type = "character", help = "ITS2 FASTA file [required]")|>
+  add_option(c("-o", "--output_dir"), type = "character", default = "r-curation",
+              help = "Output directory [default: r-curation folder]")|>
+  add_option(c("-p", "--prefix"), type = "character", default = "concat",
+              help = "Output file prefix [default: concat]")
 
-full_its <- concatITS(its1, s58, its2)
 
-write.fasta(
-  full_its, names(full_its) |> as.list(),
-  nbchar = 120,
-  file.out = paste0(outdir, "/", db, ".ITS.fasta")
-)
+arguments <- parse_args(parser)
+
+#validation---------------------------------------------------------------------
+if (is.null(arguments$its1) || is.null(arguments$s58) || is.null(arguments$its2)) {
+  print_help(parser)
+  stop("\nError: You must specify --its1, --s58, and --its2.\n", call. = FALSE)
+}
+if (arguments$output_dir != "r-curation") {
+  dir.create(arguments$output_dir, showWarnings = FALSE)
+}
+#run--------------------------------------------------------------------
+full_its <- concatITS(arguments$its1, arguments$s58, arguments$its2)
+
+write.fasta(full_its, names(full_its) |> as.list(), nbchar = 120, file.out = paste0(arguments$output_dir, "/", arguments$prefix, ".ITS.fasta"))
+
